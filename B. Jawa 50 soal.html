@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Latihan Menyusun Kalimat Bahasa Arab</title>
+<style>
+  :root {
+    --nav-width: 8cm;
+    --header-height: 1.75cm;
+    --blue-dark: #001f4d;
+    --blue: #007bff;
+    --green: #28a745;
+    --red: #dc3545;
+    --gray: #f4f4f4;
+  }
+  * {
+    box-sizing: border-box;
+    transition: all 0.2s ease-in-out;
+  }
+  body {
+    margin: 0;
+    font-family: 'Segoe UI', Tahoma, sans-serif;
+    background-color: #fafafa;
+    direction: rtl;
+    overflow: hidden;
+  }
+  header {
+    background-color: var(--blue-dark);
+    color: white;
+    text-align: center;
+    padding-top: 6px;
+    line-height: 1.25;
+    height: var(--header-height);
+    font-weight: 500;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  }
+  .container {
+    display: flex;
+    height: calc(100vh - var(--header-height));
+  }
+  nav {
+    width: var(--nav-width);
+    background-color: #e9ecef;
+    overflow-y: auto;
+    padding: 10px;
+    border-left: 3px solid var(--blue-dark);
+  }
+  nav button {
+    display: block;
+    width: 100%;
+    margin: 6px 0;
+    padding: 10px;
+    background-color: white;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    text-align: right;
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: 500;
+  }
+  nav button:hover {
+    background-color: #d6e4ff;
+  }
+  main {
+    flex: 1;
+    padding: 25px;
+    overflow-y: auto;
+  }
+  .card {
+    background-color: white;
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    padding: 25px;
+    max-width: 900px;
+    margin: auto;
+  }
+  .word-bank {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-bottom: 25px;
+  }
+  .word {
+    background-color: #edf2fb;
+    padding: 10px 16px;
+    border-radius: 12px;
+    cursor: grab;
+    font-size: 22px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+  .drop-area {
+    border: 2px dashed #aaa;
+    min-height: 80px;
+    padding: 10px;
+    border-radius: 10px;
+    background-color: #fdfdfd;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 10px;
+  }
+  .buttons {
+    margin-top: 25px;
+    display: flex;
+    justify-content: flex-start;
+    gap: 15px;
+  }
+  button.action {
+    padding: 10px 25px;
+    border: none;
+    border-radius: 10px;
+    color: white;
+    font-weight: 600;
+    font-size: 15px;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+    cursor: pointer;
+  }
+  #checkBtn { background-color: var(--green); }
+  #resetBtn { background-color: var(--red); }
+  #shuffleBtn { background-color: var(--blue); }
+  #checkBtn:hover { background-color: #218838; }
+  #resetBtn:hover { background-color: #c82333; }
+  #shuffleBtn:hover { background-color: #0069d9; }
+  #feedback {
+    margin-top: 25px;
+    font-size: 20px;
+    font-weight: bold;
+    text-align: center;
+  }
+  #scoreDisplay {
+    margin-top: 20px;
+    font-size: 18px;
+    text-align: center;
+    color: var(--blue-dark);
+  }
+</style>
+</head>
+<body>
+<header>
+  <div>LATIHAN MENYUSUN KALIMAT BAHASA ARAB</div>
+  <div>Disusun oleh: Tim Pengembang Media Pembelajaran Online Berbasis AI FK2MTs. LP Ma’arif NU Kudus</div>
+</header>
+<div class="container">
+  <nav id="navigator"></nav>
+  <main>
+    <div class="card">
+      <h2 id="questionTitle" style="text-align:center; color:#001f4d;">Pilih Soal di Navigator</h2>
+      <div class="word-bank" id="wordBank"></div>
+      <div class="drop-area" id="dropArea" ondragover="event.preventDefault()"></div>
+      <div class="buttons">
+        <button class="action" id="checkBtn" onclick="checkAnswer()">Hasil</button>
+        <button class="action" id="resetBtn" onclick="resetQuestion()">Reset</button>
+        <button class="action" id="shuffleBtn" onclick="shuffleWords()">Acak</button>
+      </div>
+      <div id="feedback"></div>
+      <div id="scoreDisplay">Skor: 0 / 100</div>
+    </div>
+  </main>
+</div>
+
+<script>
+const soal = [
+  ["أَنَا","أُحِبُّ","ٱلْمَدْرَسَةَ"],
+  ["هُوَ","يَكْتُبُ","ٱلدَّرْسَ"],
+  ["نَحْنُ","نَذْهَبُ","إِلَى","ٱلْمَسْجِدِ"],
+  ["هِيَ","تَقْرَأُ","ٱلْكِتَابَ"],
+  ["ٱلطَّالِبُ","يَجْلِسُ","فِي","ٱلْفَصْلِ"],
+  ["ٱلْمُعَلِّمُ","يُشْرِحُ","ٱلدَّرْسَ"],
+  ["أَنَا","آكُلُ","ٱلتُّفَّاحَ"],
+  ["أَنْتَ","تَشْرَبُ","ٱلْمَاءَ"],
+  ["هُمْ","يَلْعَبُونَ","فِي","ٱلْحَدِيقَةِ"],
+  ["نَحْنُ","نَكْتُبُ","ٱلْوَاجِبَ"]
+];
+while (soal.length < 50) soal.push(JSON.parse(JSON.stringify(soal[soal.length % 10])));
+
+let currentQuestion = null;
+let score = 0;
+
+function initNavigator() {
+  const nav = document.getElementById("navigator");
+  soal.forEach((_, i) => {
+    const btn = document.createElement("button");
+    btn.textContent = "Soal Nomor " + (i + 1);
+    btn.onclick = () => loadQuestion(i);
+    nav.appendChild(btn);
+  });
+}
+function loadQuestion(index) {
+  currentQuestion = index;
+  document.getElementById("questionTitle").textContent = "Soal Nomor " + (index + 1);
+  resetQuestion();
+}
+function shuffle(arr) {
+  let a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+function shuffleWords() {
+  if (currentQuestion === null) return;
+  const words = shuffle(soal[currentQuestion]);
+  renderWords(words);
+  document.getElementById("dropArea").innerHTML = "";
+  document.getElementById("feedback").textContent = "";
+}
+function renderWords(words) {
+  const wordBank = document.getElementById("wordBank");
+  wordBank.innerHTML = "";
+  words.forEach(word => {
+    const span = document.createElement("span");
+    span.className = "word";
+    span.textContent = word;
+    span.draggable = true;
+    span.ondragstart = e => {
+      e.dataTransfer.setData("text", word);
+      e.target.style.opacity = "0.5";
+    };
+    span.ondragend = e => { e.target.style.opacity = "1"; };
+    wordBank.appendChild(span);
+  });
+  const drop = document.getElementById("dropArea");
+  drop.ondrop = e => {
+    e.preventDefault();
+    const data = e.dataTransfer.getData("text");
+    const dragged = [...wordBank.children].find(el => el.textContent === data);
+    if (dragged) dragged.remove();
+    const newWord = document.createElement("span");
+    newWord.className = "word";
+    newWord.textContent = data;
+    drop.appendChild(newWord);
+  };
+}
+function resetQuestion() {
+  if (currentQuestion === null) return;
+  shuffleWords();
+  document.getElementById("feedback").textContent = "";
+}
+function checkAnswer() {
+  if (currentQuestion === null) return;
+  const dropWords = [...document.getElementById("dropArea").children].map(el => el.textContent);
+  const correct = JSON.stringify(dropWords) === JSON.stringify(soal[currentQuestion]);
+  const feedback = document.getElementById("feedback");
+  if (correct) {
+    feedback.textContent = "🌟 Hebat! Jawaban Anda benar!";
+    feedback.style.color = "green";
+    score = Math.min(100, score + 2);
+  } else {
+    feedback.textContent = "❌ Maaf. Jawaban Anda salah. Ulangi lagi.";
+    feedback.style.color = "red";
+  }
+  document.getElementById("scoreDisplay").textContent = "Skor: " + score + " / 100";
+}
+initNavigator();
+</script>
+</body>
+</html>
