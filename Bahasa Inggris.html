@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mengurutkan Kata Bahasa Inggris</title>
+<style>
+    body {
+        background-color: #004d00; /* Hijau tua (background layer) */
+        font-family: Arial, sans-serif;
+        color: black;
+        text-align: center;
+        padding: 30px;
+    }
+    .container {
+        background-color: #90EE90; /* Hijau muda (skin soal) */
+        padding: 20px;
+        border-radius: 15px;
+        display: inline-block;
+        box-shadow: 0 0 10px #222;
+        width: 80%;
+        max-width: 600px;
+    }
+    h2 {
+        margin-bottom: 10px;
+    }
+    .word-box {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        margin-bottom: 20px;
+    }
+    .word {
+        background-color: white;
+        padding: 10px 15px;
+        margin: 5px;
+        border-radius: 10px;
+        border: 2px solid #008000;
+        cursor: grab;
+        user-select: none;
+        font-weight: bold;
+        transition: 0.2s;
+    }
+    .word:hover {
+        background-color: #e6ffe6;
+        transform: scale(1.1);
+    }
+    textarea {
+        width: 80%;
+        height: 80px;
+        background-color: white; /* Warna textarea */
+        border: 2px solid #008000;
+        border-radius: 10px;
+        font-size: 16px;
+        padding: 10px;
+        margin-bottom: 15px;
+        resize: none;
+    }
+    button {
+        background-color: #008000;
+        color: white;
+        border: none;
+        border-radius: 10px;
+        padding: 10px 20px;
+        margin: 5px;
+        cursor: pointer;
+        font-size: 16px;
+        transition: 0.2s;
+    }
+    button:hover {
+        background-color: #006400;
+    }
+    #feedback {
+        font-weight: bold;
+        font-size: 18px;
+        margin-top: 10px;
+    }
+</style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Arrange the Words</h2>
+    <p>Drag and drop the words below into the box to form a correct sentence:</p>
+
+    <div id="wordBox" class="word-box"></div>
+
+    <textarea id="answerBox" placeholder="Drop words here..." 
+              ondrop="drop(event)" ondragover="allowDrop(event)"></textarea>
+    <br>
+
+    <button onclick="checkAnswer()">Hasil</button>
+    <button onclick="resetGame()">Reset</button>
+
+    <p id="feedback"></p>
+</div>
+
+<script>
+    const correctSentence = "I-am-going-to-the-market";
+    const words = ["I", "am", "going", "to", "the", "market"];
+
+    // Fungsi untuk mengacak urutan kata
+    function shuffle(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+        return array;
+    }
+
+    // Membuat tampilan kata yang bisa di-drag
+    function createWords() {
+        const box = document.getElementById("wordBox");
+        box.innerHTML = "";
+        const shuffled = shuffle([...words]);
+        shuffled.forEach(word => {
+            const span = document.createElement("div");
+            span.className = "word";
+            span.textContent = word;
+            span.draggable = true;
+            span.ondragstart = drag;
+            box.appendChild(span);
+        });
+    }
+
+    function allowDrop(ev) {
+        ev.preventDefault();
+    }
+
+    function drag(ev) {
+        ev.dataTransfer.setData("text", ev.target.textContent);
+    }
+
+    function drop(ev) {
+        ev.preventDefault();
+        const data = ev.dataTransfer.getData("text");
+        const textarea = document.getElementById("answerBox");
+
+        // Tambahkan kata ke textarea
+        textarea.value += (textarea.value ? "-" : "") + data;
+
+        // Hapus kata yang sudah dipindah dari daftar
+        const wordsList = document.getElementsByClassName("word");
+        for (let w of wordsList) {
+            if (w.textContent === data) {
+                w.remove();
+                break;
+            }
+        }
+    }
+
+    // Cek jawaban murid
+    function checkAnswer() {
+        const answer = document.getElementById("answerBox").value.trim();
+        const feedback = document.getElementById("feedback");
+        if (answer === correctSentence) {
+            feedback.textContent = "Hebat! Jawaban anda benar.";
+            feedback.style.color = "blue";
+        } else {
+            feedback.textContent = "Maaf, jawaban anda salah. Ulangi lagi.";
+            feedback.style.color = "red";
+        }
+    }
+
+    // Tombol reset
+    function resetGame() {
+        document.getElementById("answerBox").value = "";
+        document.getElementById("feedback").textContent = "";
+        createWords();
+    }
+
+    // Jalankan saat pertama kali
+    createWords();
+</script>
+
+</body>
+</html>
