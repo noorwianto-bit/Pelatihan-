@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Arrange the Words</title>
+<style>
+    body {
+        background-color: #006400; /* hijau tua */
+        font-family: Arial, sans-serif;
+        color: #000;
+        text-align: center;
+        padding: 30px;
+    }
+    .container {
+        background-color: #90EE90; /* hijau muda */
+        padding: 20px;
+        border-radius: 15px;
+        display: inline-block;
+        box-shadow: 0 0 10px #333;
+    }
+    .word-box {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        margin-bottom: 15px;
+    }
+    .word {
+        background-color: white;
+        padding: 10px 15px;
+        margin: 5px;
+        border-radius: 10px;
+        cursor: grab;
+        user-select: none;
+        border: 2px solid #008000;
+    }
+    textarea {
+        width: 80%;
+        height: 80px;
+        background-color: white; /* sesuai poin 9 */
+        border: 2px solid #008000;
+        border-radius: 10px;
+        font-size: 16px;
+        padding: 10px;
+        margin-bottom: 15px;
+    }
+    button {
+        background-color: #008000;
+        color: white;
+        border: none;
+        border-radius: 10px;
+        padding: 10px 20px;
+        margin: 5px;
+        cursor: pointer;
+        font-size: 16px;
+    }
+    button:hover {
+        background-color: #004d00;
+    }
+    #feedback {
+        font-weight: bold;
+        font-size: 18px;
+        margin-top: 10px;
+    }
+</style>
+</head>
+<body>
+    <div class="container">
+        <h2>Arrange the Words</h2>
+        <p>Drag and drop the words into the box below to form the correct sentence:</p>
+        <div id="wordBox" class="word-box"></div>
+
+        <textarea id="answerBox" placeholder="Drop words here..." ondrop="drop(ev
