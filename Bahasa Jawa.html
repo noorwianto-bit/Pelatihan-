@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Latihan Menyusun Kalimat Bahasa Jawa</title>
+<style>
+    :root{
+        --nav-width: 8cm;
+        --header-height: 1.75cm;
+        --header-bg: #001f3f; /* biru dongker */
+        --skin-bg: #90EE90; /* hijau muda untuk area konten */
+        --page-bg: #004d00; /* hijau tua background layer */
+    }
+    html,body{
+        height:100%;
+        margin:0;
+        padding:0;
+        font-family: "Segoe UI", Roboto, Arial, sans-serif;
+        background-color: var(--page-bg);
+    }
+
+    /* Header full width, melintas di atas navigator dan konten */
+    header{
+        position:fixed;
+        top:0;
+        left:0;
+        right:0;
+        height: var(--header-height);
+        background: var(--header-bg);
+        color: #fff;
+        display:flex;
+        flex-direction:column;
+        justify-content:center;
+        align-items:center;
+        z-index:1000;
+        line-height:1.25; /* spasi antar tulisan = 1.25 */
+        padding: 0.1cm 0.5cm;
+        box-sizing:border-box;
+    }
+    header h1{
+        margin:0;
+        font-size:1.0rem;
+        font-weight:700;
+    }
+    header p{
+        margin:0;
+        font-size:0.75rem;
+        opacity:0.95;
+    }
+
+    /* Layout: navigator kiri, konten di kanan */
+    .main {
+        display:flex;
+        margin-top: var(--header-height); /* supaya tidak tertutup header */
+        height: calc(100vh - var(--header-height));
+        box-sizing: border-box;
+        padding: 0.5cm;
+    }
+
+    nav {
+        width: var(--nav-width);
+        background: #f7f7f7;
+        border-radius: 8px;
+        padding: 8px;
+        box-sizing:border-box;
+        margin-right: 1rem;
+        overflow:auto;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    }
+    nav h3{
+        margin:0 0 8px 0;
+        text-align:center;
+        font-size:0.95rem;
+    }
+    .nav-list{
+        list-style:none;
+        padding:0;
+        margin:0;
+    }
+    .nav-list li{
+        padding:8px 10px;
+        margin-bottom:6px;
+        background:#fff;
+        border-radius:6px;
+        cursor:pointer;
+        border:1px solid #ddd;
+        text-align:center;
+        user-select:none;
+    }
+    .nav-list li.active{
+        background:#e6f7ff;
+        border-color:#66b2ff;
+        font-weight:700;
+    }
+
+    /* Konten area (skin hijau muda) */
+    .content {
+        flex:1;
+        background: var(--skin-bg);
+        border-radius:12px;
+        padding:16px;
+        box-sizing:border-box;
+        overflow:auto;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+    }
+
+    .question-title{
+        margin:0 0 8px 0;
+        font-size:1.05rem;
+        font-weight:700;
+    }
+    .instruction{
+        margin:0 0 12px 0;
+    }
+
+    /* Kotak kata (draggables) */
+    .word-bank {
+        display:flex;
+        flex-wrap:wrap;
+        gap:8px;
+        margin-bottom:12px;
+        justify-content:flex-start; /* bahasa Jawa LTR */
+    }
+    .word{
+        background:white;
+        padding:8px 12px;
+        border-radius:8px;
+        border:1px solid #008000;
+        cursor:grab;
+        user-select:none;
+        font-weight:600;
+    }
+
+    /* Textarea (tempat drop) */
+    #answerBox{
+        width:100%;
+        min-height:80px;
+        max-height:200px;
+        padding:10px;
+        font-size:16px;
+        border-radius:10px;
+        border:2px solid #008000;
+        background:white;
+        box-sizing:border-box;
+        resize:vertical;
+        direction:ltr; /* Javanese LTR */
+    }
+
+    /* Tombol */
+    .controls{
+        margin-top:10px;
+        display:flex;
+        gap:10px;
+        flex-wrap:wrap;
+    }
+    button{
+        padding:8px 14px;
+        border-radius:8px;
+        border:none;
+        cursor:pointer;
+        font-weight:700;
+    }
+    button#btnHasil{ background:#28a745; color:#fff; } /* hijau */
+    button#btnReset{ background:#dc3545; color:#fff; } /* merah */
+    button#btnAcak { background:#007bff; color:#fff; } /* biru */
+
+    /* Feedback */
+    #feedback{
+        margin-top:12px;
+        font-weight:800;
+        font-size:1rem;
+    }
+
+    /* Responsive kecil */
+    @media(max-width:700px){
+        nav{ display:none; }
+        .main{ padding:0.3cm; }
+    }
+
+</style>
+</head>
+<body>
+
+<header>
+    <h1>LATIHAN MENYUSUN KALIMAT BAHASA JAWA</h1>
+    <p>Disusun oleh: Tim Pengembang Media Pembelajaran Online Berbasis AI</p>
+</header>
+
+<div class="main">
+    <nav aria-label="Navigator Soal">
+        <h3>Navigator Soal</h3>
+        <ul class="nav-list" id="navList">
+            <!-- Diisi oleh JS -->
+        </ul>
+    </nav>
+
+    <section class="content" id="contentArea">
+        <h2 class="question-title" id="questionTitle">Soal Nomor 1</h2>
+        <p class="instruction">Susun kalimat kanthi bener. Seret (drag) tembung menyang kolom jawaban. Tembung sing wis dipindhah bakal ilang saka bank tembung.</p>
+
+        <div class="word-bank" id="wordBank">
+            <!-- kata-kata muncul di sini -->
+        </div>
+
+        <textarea id="answerBox" placeholder="Taruh tembung kene (drag & drop)..." ondragover="allowDrop(event)" ondrop="dropToAnswer(event)"></textarea>
+
+        <div class="controls">
+            <button id="btnHasil" onclick="checkAnswer()">Hasil</button>
+            <button id="btnReset" onclick="resetQuestion()">Reset</button>
+            <button id="btnAcak" onclick="shuffleWords()">Acak</button>
+        </div>
+
+        <div id="feedback" aria-live="polite"></div>
+    </section>
+</div>
+
+<script>
+/*
+ Soal-soal (versi Bahasa Jawa).
+ setiap soal adalah array kata dalam urutan benar (left-to-right).
+ Saat ditampilkan, array akan diacak; siswa harus menyusunnya kembali.
+*/
+const questions = [
+    // Soal 1
+    ["Aku","tresna","sekolah"],
+
+    // Soal 2
+    ["Dheweke","nulis","pelajaran"],
+
+    // Soal 3
+    ["Kita","menyang","masjid"],
+
+    // Soal 4
+    ["Dheweke","maca","buku"],
+
+    // Soal 5
+    ["Murid","lungguh","ing","kelas"],
+
+    // Soal 6
+    ["Guru","nerangake","pelajaran"],
+
+    // Soal 7
+    ["Aku","mangan","apel"],
+
+    // Soal 8
+    ["Kowe","ngombe","banyu"],
+
+    // Soal 9
+    ["Padha","dolanan","ing","kebon"],
+
+    // Soal 10
+    ["Kita","nulis","tugas","omah"]
+];
+
+// State
+let currentIndex = 0; // soal yg sedang tampil, 0-based
+let shuffledBank = []; // kata2 yg terlihat (diacak)
+const navListEl = document.getElementById('navList');
+const wordBankEl = document.getElementById('wordBank');
+const answerBoxEl = document.getElementById('answerBox');
+const feedbackEl = document.getElementById('feedback');
+const questionTitleEl = document.getElementById('questionTitle');
+
+// buat navigator (Soal Nomor 1..10)
+function initNav(){
+    navListEl.innerHTML = "";
+    for(let i=0;i<questions.length;i++){
+        const li = document.createElement('li');
+        li.textContent = "Soal Nomor " + (i+1);
+        li.dataset.index = i;
+        li.onclick = () => { loadQuestion(i); highlightNav(i); };
+        navListEl.appendChild(li);
+    }
+    highlightNav(0);
+}
+
+// highlight navigator aktif
+function highlightNav(idx){
+    const items = navListEl.querySelectorAll('li');
+    items.forEach(it => it.classList.remove('active'));
+    const active = navListEl.querySelector(`li[data-index='${idx}']`);
+    if(active) active.classList.add('active');
+}
+
+// returning a shallow copy shuffled
+function shuffleArray(arr){
+    const a = arr.slice();
+    for(let i=a.length-1;i>0;i--){
+        const j = Math.floor(Math.random()*(i+1));
+        [a[i],a[j]] = [a[j],a[i]];
+    }
+    return a;
+}
+
+// load question by index
+function loadQuestion(idx){
+    currentIndex = idx;
+    questionTitleEl.textContent = "Soal Nomor " + (idx+1);
+    feedbackEl.textContent = "";
+    answerBoxEl.value = "";
+    // tampilkan kata2 yang sudah diacak (bukan urutan asli)
+    shuffledBank = shuffleArray(questions[idx]);
+    renderWordBank();
+}
+
+// render bank kata ke DOM
+function renderWordBank(){
+    wordBankEl.innerHTML = "";
+    shuffledBank.forEach(word => {
+        const d = document.createElement('div');
+        d.className = 'word';
+        d.draggable = true;
+        d.textContent = word;
+        d.ondragstart = dragStart;
+        // aksesibilitas: klik untuk pindah (opsional)
+        d.onclick = () => { dropWordByClick(word); };
+        wordBankEl.appendChild(d);
+    });
+}
+
+// dragstart handler
+function dragStart(ev){
+    ev.dataTransfer.setData("text/plain", ev.target.textContent);
+}
+
+// allowDrop for textarea already set inline; but define function
+function allowDrop(ev){
+    ev.preventDefault();
+}
+
+// drop handler: menaruh kata ke textarea
+function dropToAnswer(ev){
+    ev.preventDefault();
+    const word = ev.dataTransfer.getData("text/plain");
+    if(!word) return;
+    appendWordToAnswer(word);
+    removeWordFromBank(word);
+}
+
+// juga sediakan fungsi untuk pindah via klik (mobile friendly)
+function dropWordByClick(word){
+    appendWordToAnswer(word);
+    removeWordFromBank(word);
+}
+
+// append kata ke textarea (gunakan tanda '-' pemisah)
+function appendWordToAnswer(word){
+    // pastikan spasi/trim
+    const cur = answerBoxEl.value.trim();
+    answerBoxEl.value = cur ? (cur + "-" + word) : word;
+}
+
+// menghapus kata dari bank setelah dipindah
+function removeWordFromBank(word){
+    // hapus satu instance pertama yang cocok
+    const idx = shuffledBank.indexOf(word);
+    if(idx !== -1){
+        shuffledBank.splice(idx,1);
+        renderWordBank();
+    }
+}
+
+// tombol Acak: acak ulang kata yg tersedia (juga reset answer)
+function shuffleWords(){
+    shuffledBank = shuffleArray(questions[currentIndex]);
+    answerBoxEl.value = "";
+    feedbackEl.textContent = "";
+    renderWordBank();
+}
+
+// tombol Reset: kosongkan jawaban dan kembalikan kata
+function resetQuestion(){
+    shuffledBank = shuffleArray(questions[currentIndex]);
+    answerBoxEl.value = "";
+    feedbackEl.textContent = "";
+    renderWordBank();
+}
+
+// check answer
+function checkAnswer(){
+    const user = answerBoxEl.value.trim();
+    // bentuk jawaban benar: kata-kata original digabung dengan '-' (sesuai urutan di questions)
+    const correct = questions[currentIndex].join("-");
+    if(user === correct){
+        feedbackEl.style.color = "#0b6623"; // hijau gelap
+        feedbackEl.textContent = "Hebat. Jawaban Anda benar";
+    } else {
+        feedbackEl.style.color = "#b30000"; // merah
+        feedbackEl.textContent = "Maaf. Jawaban Anda salah. Ulangi lagi.";
+    }
+}
+
+// init awal
+initNav();
+loadQuestion(0);
+
+/* Pastikan: ketika user klik navigator di kiri, soal dimunculkan di konten:
+   fungsi loadQuestion melakukan itu. Navigator lebarnya ~8cm di CSS.
+*/
+
+/* Catatan tambahan:
+ - Bahasa Jawa pada soal menggunakan penulisan latin (LTR), jadi direction LTR.
+ - Drag & drop serta klik pada kata mendukung pemindahan (mobile friendly).
+*/
+
+</script>
+
+</body>
+</html>
