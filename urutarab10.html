@@ -1,0 +1,279 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Latihan Menyusun Kalimat Bahasa Arab</title>
+  <style>
+    :root{
+      --header-bg: #0b2447; /* biru dongker */
+      --nav-width: 8cm; /* lebar navigator */
+      --card-bg: #eef2ff; /* terang untuk konten */
+      --btn-green: #16a34a;
+      --btn-red: #dc2626;
+      --btn-blue: #2563eb;
+    }
+
+    /* Reset & layout */
+    *{box-sizing:border-box}
+    body{margin:0; font-family: 'Segoe UI', Tahoma, system-ui, 'Noto Naskh Arabic', 'Scheherazade', serif; background:var(--card-bg); direction:rtl}
+
+    /* Header full width */
+    header{
+      width:100%;
+      height:1.75cm; /* sesuai permintaan */
+      background:var(--header-bg);
+      color:white;
+      position:fixed;
+      top:0; left:0;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:6px 12px;
+      line-height:1.25; /* spasi antar tulisan */
+      z-index:1000;
+      text-align:center;
+    }
+    header .title{font-weight:700; font-size:1rem}
+    header .subtitle{font-size:0.8rem}
+
+    /* Main layout: navigator left, content right. The header overlays both. */
+    .layout{display:flex; gap:12px; margin-top:1.75cm; padding:18px}
+
+    /* Navigator (kiri) */
+    nav{
+      width:var(--nav-width);
+      background:#fff; border-radius:8px; padding:10px; box-shadow:0 6px 18px rgba(2,6,23,0.12);
+      height:calc(100vh - 1.75cm - 36px); /* memperhitungkan header + padding */
+      overflow:auto;
+      position:sticky; top:1.9cm; /* agar berada di bawah header saat scroll */
+      direction:rtl;
+    }
+    nav h3{margin:6px 0 10px 0; text-align:center}
+    .nav-list{display:flex; flex-direction:column; gap:8px}
+    .nav-item{
+      background:#f8fafc; border:1px solid #e6eef9; padding:8px 10px; border-radius:6px; cursor:pointer; text-align:center;
+      user-select:none;
+    }
+    .nav-item.active{background:#bfdbfe; border-color:#93c5fd; font-weight:700}
+
+    /* Konten (kanan) */
+    .content{flex:1; min-height:400px}
+    .card{background:white; border-radius:10px; padding:18px; box-shadow:0 6px 20px rgba(2,6,23,0.08)}
+
+    .words{display:flex; flex-wrap:wrap; gap:10px; justify-content:flex-start; margin-bottom:12px; direction:rtl}
+    .word{
+      background:#fff; padding:10px 12px; border-radius:8px; border:1px solid #e2e8f0; cursor:grab; user-select:none; font-size:1.05rem
+    }
+
+    /* area jawaban (bersih) */
+    textarea#answer{width:100%; height:140px; border-radius:8px; border:1px solid #e2e8f0; padding:12px; font-size:1.05rem; background:white; resize:none; direction:rtl; text-align:right}
+
+    .controls{display:flex; gap:8px; margin-top:12px}
+    .controls button{padding:10px 12px; border-radius:8px; border:none; color:white; font-weight:700; cursor:pointer}
+    .btn-hasil{background:var(--btn-green)}
+    .btn-reset{background:var(--btn-red)}
+    .btn-acak{background:var(--btn-blue)}
+
+    .feedback{margin-top:12px; font-weight:800}
+    .correct{color:#047857}
+    .wrong{color:#b91c1c}
+
+    /* responsive */
+    @media (max-width:900px){
+      .layout{flex-direction:column}
+      nav{width:100%; height:auto; position:relative}
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <div class="title">LATIHAN MENYUSUN KALIMAT BAHASA ARAB</div>
+      <div class="subtitle">Disusun oleh: Tim Pengembang Media Pembelajaran Online Berbasis AI FK2 MTs. LP. Ma'arif Kudus</div>
+    </div>
+  </header>
+
+  <div class="layout">
+    <!-- Navigator kiri -->
+    <nav aria-label="Navigator Soal">
+      <h3>Daftar Soal</h3>
+      <div class="nav-list" id="navList"></div>
+    </nav>
+
+    <!-- Konten kanan -->
+    <main class="content">
+      <div class="card">
+        <h2 id="soalTitle" style="text-align:center; margin:0 0 8px 0">Soal Nomor 1</h2>
+        <p style="text-align:center; margin:0 0 12px 0;">Susun kalimat dengan menyeret kata dari kotak kata ke area jawaban (kanan-ke-kiri).</p>
+
+        <div id="wordContainer" class="words" aria-live="polite"></div>
+
+        <textarea id="answer" placeholder="" aria-label="Area jawaban"></textarea>
+
+        <div class="controls">
+          <button class="btn-hasil" id="check">Hasil</button>
+          <button class="btn-reset" id="reset">Reset</button>
+          <button class="btn-acak" id="shuffle">Acak</button>
+        </div>
+
+        <div id="feedback" class="feedback"></div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    // Daftar soal (kata disimpan dalam urutan benar dari kanan ke kiri pada array)
+    const questions = [
+      {words:["أَنَا","أُحِبُّ","ٱلْمَدْرَسَةَ"]},
+      {words:["هُوَ","يَكْتُبُ","ٱلدَّرْسَ"]},
+      {words:["نَحْنُ","نَذْهَبُ","إِلَى","ٱلْمَسْجِدِ"]},
+      {words:["هِيَ","تَقْرَأُ","ٱلْكِتَابَ"]},
+      {words:["ٱلطَّالِبُ","يَجْلِسُ","فِي","ٱلْفَصْلِ"]},
+      {words:["ٱلْمُعَلِّمُ","يُشْرِحُ","ٱلدَّرْسَ"]},
+      {words:["أَنَا","آكُلُ","ٱلتُّفَّاحَ"]},
+      {words:["أَنْتَ","تَشْرَبُ","ٱلْمَاءَ"]},
+      {words:["هُمْ","يَلْعَبُونَ","فِي","ٱلْحَدِيقَةِ"]},
+      {words:["نَحْنُ","نَكْتُبُ","ٱلْوَاجِبَ"]}
+    ];
+
+    // State
+    let current = 0;
+    const navList = document.getElementById('navList');
+    const wordContainer = document.getElementById('wordContainer');
+    const answer = document.getElementById('answer');
+    const feedback = document.getElementById('feedback');
+    const soalTitle = document.getElementById('soalTitle');
+
+    // helper: shuffle copy
+    function shuffle(arr){
+      const a = arr.slice();
+      for(let i=a.length-1;i>0;i--){
+        const j = Math.floor(Math.random()*(i+1));
+        [a[i], a[j]] = [a[j], a[i]];
+      }
+      return a;
+    }
+
+    // render navigator
+    function renderNav(){
+      navList.innerHTML = '';
+      questions.forEach((q,i)=>{
+        const item = document.createElement('div');
+        item.className = 'nav-item' + (i===current? ' active':'');
+        item.textContent = 'Soal Nomor ' + (i+1);
+        item.addEventListener('click', ()=>{
+          current = i; renderQuestion();
+          // update active class
+          document.querySelectorAll('.nav-item').forEach((n,idx)=> n.classList.toggle('active', idx===current));
+        });
+        navList.appendChild(item);
+      });
+    }
+
+    // Render kata-kata untuk soal current (acak pada tiap render)
+    let currentShuffled = [];
+    function renderQuestion(){
+      wordContainer.innerHTML = '';
+      answer.value = '';
+      feedback.textContent = '';
+      soalTitle.textContent = 'Soal Nomor ' + (current+1);
+
+      // shuffle kata untuk tampilan
+      currentShuffled = shuffle(questions[current].words);
+
+      currentShuffled.forEach(w => {
+        const el = document.createElement('div');
+        el.className = 'word';
+        el.textContent = w;
+        el.draggable = true;
+        // drag handlers
+        el.addEventListener('dragstart', e=>{
+          e.dataTransfer.setData('text/plain', w);
+          e.target.style.opacity = '0.5';
+        });
+        el.addEventListener('dragend', e=>{ e.target.style.opacity = '1'; });
+
+        // also allow click/tap to move for devices without drag
+        el.addEventListener('click', ()=>{
+          moveWordToAnswer(w);
+        });
+
+        wordContainer.appendChild(el);
+      });
+
+      // mark active in nav
+      document.querySelectorAll('.nav-item').forEach((n,idx)=> n.classList.toggle('active', idx===current));
+    }
+
+    // move word into textarea and remove from container
+    function moveWordToAnswer(word){
+      // append with single space (Arabic has spaces between words)
+      answer.value = (answer.value? answer.value + ' ' : '') + word;
+      // remove first matching element
+      const el = [...wordContainer.children].find(c => c.textContent === word);
+      if(el) el.remove();
+    }
+
+    // allow drop on textarea
+    answer.addEventListener('dragover', e=> e.preventDefault());
+    answer.addEventListener('drop', e=>{
+      e.preventDefault();
+      const word = e.dataTransfer.getData('text/plain');
+      if(!word) return;
+      moveWordToAnswer(word);
+    });
+
+    // check answer: compare token arrays (trim & normalize spaces)
+    function checkAnswer(){
+      const userTokens = answer.value.trim().split(/\s+/).filter(Boolean);
+      const correctTokens = questions[current].words.slice();
+      // compare lengths first
+      if(userTokens.length !== correctTokens.length){
+        return false;
+      }
+      // compare each token in order (user must match correct sequence)
+      for(let i=0;i<correctTokens.length;i++){
+        if(userTokens[i] !== correctTokens[i]) return false;
+      }
+      return true;
+    }
+
+    document.getElementById('check').addEventListener('click', ()=>{
+      if(checkAnswer()){
+        feedback.textContent = 'Hebat. Jawaban Anda benar';
+        feedback.className = 'feedback correct';
+      } else {
+        feedback.textContent = 'Maaf. Jawaban Anda salah. Ulangi lagi.';
+        feedback.className = 'feedback wrong';
+      }
+    });
+
+    // reset: re-render question (which will reshuffle)
+    document.getElementById('reset').addEventListener('click', ()=>{
+      renderQuestion();
+    });
+
+    // acak: reshuffle current words without changing question index
+    document.getElementById('shuffle').addEventListener('click', ()=>{
+      // reshuffle currentShuffled
+      currentShuffled = shuffle(currentShuffled);
+      // re-render the wordContainer keeping removed words (so first reconstruct from currentShuffled)
+      wordContainer.innerHTML = '';
+      currentShuffled.forEach(w=>{
+        const el = document.createElement('div');
+        el.className = 'word'; el.textContent = w; el.draggable = true;
+        el.addEventListener('dragstart', e=>{ e.dataTransfer.setData('text/plain', w); e.target.style.opacity='0.5'; });
+        el.addEventListener('dragend', e=>{ e.target.style.opacity='1'; });
+        el.addEventListener('click', ()=> moveWordToAnswer(w));
+        wordContainer.appendChild(el);
+      });
+      feedback.textContent = '';
+    });
+
+    // initialize
+    renderNav();
+    renderQuestion();
+  </script>
+</body>
+</html>
