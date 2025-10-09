@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Teks Rompang: Perkenalan</title>
+<style>
+  body {
+    background-color: #001f4d; /* biru tua untuk layar laptop */
+    font-family: Arial, sans-serif;
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+  }
+
+  .container {
+    background-color: #add8e6; /* biru muda untuk skin soal */
+    padding: 20px 30px;
+    border-radius: 15px;
+    width: 90%;
+    max-width: 700px;
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
+  }
+
+  h2 {
+    text-align: center;
+    color: #000;
+  }
+
+  textarea {
+    width: 60px;
+    height: 25px;
+    background-color: white; /* putih dan bersih */
+    color: black;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    resize: none;
+    text-align: center;
+    font-size: 14px;
+  }
+
+  .buttons {
+    text-align: center;
+    margin-top: 20px;
+  }
+
+  button {
+    background-color: #0055cc;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 20px;
+    margin: 5px;
+    font-size: 16px;
+    cursor: pointer;
+  }
+
+  button:hover {
+    background-color: #003f99;
+  }
+
+  #feedback {
+    text-align: center;
+    font-weight: bold;
+    margin-top: 15px;
+    color: #000;
+  }
+
+  audio {
+    width: 100%;
+    margin-bottom: 15px;
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <h2>Listen and Fill in the Blanks</h2>
+  
+  <!-- Audio -->
+  <audio controls>
+    <source src="https://juna-arjuna.github.io/Media-Pembelajaran/perkenalan.mp3" type="audio/mpeg">
+    Your browser does not support the audio element.
+  </audio>
+  
+  <!-- Teks rompang -->
+  <p style="color:#000;">
+    My name is Junaidi, and I was 
+    <textarea id="ans1"></textarea> in Kudus in 
+    <textarea id="ans2"></textarea>. 
+    I live in a small 
+    <textarea id="ans3"></textarea> called Kaliwungu, Kudus Regency. 
+    I'm 
+    <textarea id="ans4"></textarea> and have 
+    <textarea id="ans5"></textarea> children. 
+    I work as a 
+    <textarea id="ans6"></textarea> at MTs NU Nurul Huda. 
+    My 
+    <textarea id="ans7"></textarea> is website development.
+  </p>
+
+  <div class="buttons">
+    <button onclick="checkAnswers()">Hasil</button>
+    <button onclick="resetAnswers()">Reset</button>
+  </div>
+
+  <div id="feedback"></div>
+</div>
+
+<script>
+function checkAnswers() {
+  const answers = [
+    document.getElementById('ans1').value.trim().toLowerCase(),
+    document.getElementById('ans2').value.trim().toLowerCase(),
+    document.getElementById('ans3').value.trim().toLowerCase(),
+    document.getElementById('ans4').value.trim().toLowerCase(),
+    document.getElementById('ans5').value.trim().toLowerCase(),
+    document.getElementById('ans6').value.trim().toLowerCase(),
+    document.getElementById('ans7').value.trim().toLowerCase()
+  ];
+
+  const correct = ["born", "1984", "village", "married", "three", "teacher", "passion"];
+
+  let allCorrect = true;
+  for (let i = 0; i < correct.length; i++) {
+    if (answers[i] !== correct[i]) {
+      allCorrect = false;
+      break;
+    }
+  }
+
+  const feedback = document.getElementById("feedback");
+  if (allCorrect) {
+    feedback.textContent = "Hebat. Jawaban anda benar!";
+    feedback.style.color = "green";
+  } else {
+    feedback.textContent = "Maaf. Jawaban anda salah, ulangi lagi.";
+    feedback.style.color = "red";
+  }
+}
+
+function resetAnswers() {
+  for (let i = 1; i <= 7; i++) {
+    document.getElementById('ans' + i).value = "";
+  }
+  document.getElementById("feedback").textContent = "";
+}
+</script>
+
+</body>
+</html>
